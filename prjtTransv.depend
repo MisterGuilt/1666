@@ -1,0 +1,36 @@
+# depslib dependency file v1.0
+1524093096 source:c:\users\antho\desktop\prjttransv\main.cpp
+	<iostream>
+	<stdlib.h>
+	<SDL/SDL.h>
+	<SDL_ttf.h>
+
+1524085536 source:c:\users\antho\desktop\prjttransv\src\bouton.cpp
+	"Bouton.h"
+	<stdlib.h>
+	<stdio.h>
+	<SDL.h>
+	<SDL_ttf.h>
+
+1524085528 c:\users\antho\desktop\prjttransv\include\bouton.h
+	<stdlib.h>
+	<stdio.h>
+	<SDL.h>
+	<SDL_ttf.h>
+
+1524085511 source:c:\users\antho\desktop\prjttransv\src\surface.cpp
+	"Surface.h"
+
+1524082329 c:\users\antho\desktop\prjttransv\include\surface.h
+
+1524083909 source:c:\users\antho\desktop\prjttransv\src\menu.cpp
+	"Menu.h"
+
+1524085626 c:\users\antho\desktop\prjttransv\include\menu.h
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<vector>
+	<SDL.h>
+	"Surface.h"
+
