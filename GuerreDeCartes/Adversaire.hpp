@@ -11,6 +11,7 @@ class Adversaire
         Carte tete;
         Carte jeu[4];
         int points;
+        bool ordinateurActif;
         std::vector<Carte> figuresGagnees;
         int tailleMemoireMax;
         std::vector<Carte> memoire;
@@ -29,7 +30,7 @@ class Adversaire
         void changerCarte(int numero, Carte nouvelle);
         void echangerCarteDansMain(int numero1, int numero2);
     public:
-        Adversaire(PaquetCartes& pioche, PaquetCartes& figures);
+        Adversaire(PaquetCartes& pioche, PaquetCartes& figures, bool ordinateur);
         void action(PaquetCartes& pioche, PaquetCartes& piocheFigures, PaquetCartes& defausse);
         int getPoints();
         void afficherTete();

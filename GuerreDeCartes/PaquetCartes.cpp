@@ -2,9 +2,8 @@
 
 using namespace std;
 
-PaquetCartes::PaquetCartes(int _type)
+PaquetCartes::PaquetCartes(int _type) : type(_type), pile (vector<Carte>(0))
 {
-    type = _type;
     if(type == 0)//tetes
     {
         for(int i = 1; i < 1 + NOMBRE_COULEURS; i++)
