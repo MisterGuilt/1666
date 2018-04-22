@@ -64,3 +64,65 @@
 1523137373 c:\users\héloïse\desktop\guerredecartes\listedates.hpp
 	"constantes.hpp"
 
+1524398190 source:g:\projet transverse\depot git\guerredecartes\adversaire.cpp
+	"adversaire.hpp"
+
+1524400172 g:\projet transverse\depot git\guerredecartes\adversaire.hpp
+	"Cartes.hpp"
+	"PaquetCartes.hpp"
+	"console.hpp"
+
+1524400020 g:\projet transverse\depot git\guerredecartes\cartes.hpp
+	"constantes.hpp"
+
+1524395430 g:\projet transverse\depot git\guerredecartes\constantes.hpp
+	<iostream>
+	<stdio.h>
+	<vector>
+	<cstdlib>
+	<ctime>
+	<conio.h>
+	<windows.h>
+	<cstdlib>
+	<limits>
+
+1524395430 g:\projet transverse\depot git\guerredecartes\paquetcartes.hpp
+	"constantes.hpp"
+	"Cartes.hpp"
+
+1524395430 g:\projet transverse\depot git\guerredecartes\console.hpp
+	"constantes.hpp"
+
+1524400020 source:g:\projet transverse\depot git\guerredecartes\cartes.cpp
+	"Cartes.hpp"
+
+1524395430 source:g:\projet transverse\depot git\guerredecartes\console.cpp
+	"console.hpp"
+
+1524395430 source:g:\projet transverse\depot git\guerredecartes\joueur.cpp
+	"Joueur.hpp"
+
+1524395430 g:\projet transverse\depot git\guerredecartes\joueur.hpp
+	"constantes.hpp"
+	"Cartes.hpp"
+	"PaquetCartes.hpp"
+	"console.hpp"
+	"ListeDates.hpp"
+
+1524395430 g:\projet transverse\depot git\guerredecartes\listedates.hpp
+	"constantes.hpp"
+
+1524395430 source:g:\projet transverse\depot git\guerredecartes\listedates.cpp
+	"ListeDates.hpp"
+
+1524398456 source:g:\projet transverse\depot git\guerredecartes\main.cpp
+	"constantes.hpp"
+	"Cartes.hpp"
+	"PaquetCartes.hpp"
+	"Joueur.hpp"
+	"Adversaire.hpp"
+	"console.hpp"
+
+1524398714 source:g:\projet transverse\depot git\guerredecartes\paquetcartes.cpp
+	"PaquetCartes.hpp"
+

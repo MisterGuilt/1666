@@ -2,10 +2,11 @@
 
 using namespace std;
 
-Adversaire::Adversaire(PaquetCartes& pioche, PaquetCartes& figures)
+Adversaire::Adversaire(PaquetCartes& pioche, PaquetCartes& figures, bool ordinateur)
 {
     points = 0;
     tailleMemoireMax = 40;
+    ordinateurActif = ordinateur;
     for(int i = 0; i < 4; i++)
     {
         jeu[i] = pioche.enleverCarteDessus();
@@ -13,7 +14,7 @@ Adversaire::Adversaire(PaquetCartes& pioche, PaquetCartes& figures)
     tete = figures.enleverCarteDessus();
 }
 
-bool Adversaire::verifierFigure()
+int Adversaire::verifierFigure()
 {
     int dateTete = tete.getDate();
     int date = jeu[0].getValeur() * 1000 + jeu[1].getValeur() * 100 + jeu[2].getValeur() * 10 + jeu[3].getValeur();
@@ -152,8 +153,20 @@ void Adversaire::afficherMain()
 {
     for(int i = 0; i < 4; i++)
     {
-        jeu[i].afficher();
-        cout << ", ";
+        if(i < 2)
+        {
+            jeu[i].afficher();
+            cout << ", ";
+        }
+        if(i >= 2)
+        {
+            if(ordinateurActif) cout << "????, ";
+            else
+            {
+                jeu[i].afficher();
+                cout << ", ";
+            }
+        }
     }
 }
 void Adversaire::afficherTete()

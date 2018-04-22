@@ -15,10 +15,10 @@ int main()
     figures.melange();
     chiffres.melange();
     Joueur utilisateur(chiffres, figures);
-    Adversaire ordinateur(chiffres, figures);
+    bool ordi = false;
     int nombreTours = 0;
     bool jeuEnCours = true;
-    char affichageRegles;
+    char charChoix;
     int tourJoueur = rand() % 2;
 
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -28,15 +28,24 @@ int main()
     cout << " Voulez-vous lire les regles (o/n) ? ";
     do
     {
-        cin >> affichageRegles;
-    }while(affichageRegles != 'o' && affichageRegles != 'n');
-    if(affichageRegles == 'o')
+        cin >> charChoix;
+    }while(charChoix != 'o' && charChoix != 'n');
+    if(charChoix == 'o')
     {
         cout << endl;
         cout << "Afficher les regles ici" << endl;
         system("pause");
     }
-
+    cout << " Voulez-vous activer l'IA (o/n) ? ";
+    do
+    {
+        cin >> charChoix;
+    }while(charChoix != 'o' && charChoix != 'n');
+    if(charChoix == 'o')
+    {
+        ordi = true;
+    }
+    Adversaire ordinateur(chiffres, figures, ordi);
     do
     {
         system("cls");
