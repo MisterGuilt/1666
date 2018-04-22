@@ -25,7 +25,7 @@ void page_principale(SDL_Surface* screen)
     TTF_Font *police = NULL;
     SDL_Color couleurBlanche = {255, 255, 255};
     police = TTF_OpenFont("monof56.ttf", 80);           // Chargement de la police
-    texte = TTF_RenderText_Blended(police, "Bienvenue sur GRID WARS !", couleurBlanche);      // Écriture du texte dans la SDL_Surface texte en mode Blended (optimal)
+    texte = TTF_RenderText_Blended(police, "Bienvenue sur 1666 !", couleurBlanche);      // Écriture du texte dans la SDL_Surface texte en mode Blended (optimal)
     SDL_BlitSurface (bouton_Principale, NULL ,screen, &positionB);
     SDL_BlitSurface (texte, NULL ,screen, positionCarte);
 
