@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
-#include <SDL.h>;
-#include "Surface.h";
+#include <SDL/SDL.h>
+#include "Surface.h"
 #ifndef MENU_H
 #define MENU_H
 
