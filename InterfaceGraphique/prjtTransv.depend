@@ -1,0 +1,84 @@
+# depslib dependency file v1.0
+1524251498 source:c:\users\antho\desktop\prjttransv\main.cpp
+	<iostream>
+	<stdlib.h>
+	<SDL/SDL.h>
+	<SDL_ttf.h>
+	"Bouton.h"
+	<string>
+
+1524152874 source:c:\users\antho\desktop\prjttransv\src\bouton.cpp
+	"Bouton.h"
+
+1524130172 c:\users\antho\desktop\prjttransv\include\bouton.h
+	<stdlib.h>
+	<stdio.h>
+	<SDL.h>
+	<SDL_ttf.h>
+	<SDL.h>
+	<stdlib.h>
+	<stdio.h>
+
+1524085511 source:c:\users\antho\desktop\prjttransv\src\surface.cpp
+	"Surface.h"
+
+1524082329 c:\users\antho\desktop\prjttransv\include\surface.h
+
+1524083909 source:c:\users\antho\desktop\prjttransv\src\menu.cpp
+	"Menu.h"
+
+1524085626 c:\users\antho\desktop\prjttransv\include\menu.h
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<vector>
+	<SDL.h>
+	"Surface.h"
+
+1345864066 c:\users\antho\desktop\prjttransv\include\stdio.h
+	<_mingw.h>
+	<stddef.h>
+	<stdarg.h>
+	<sys/types.h>
+
+1524149276 source:g:\projet transverse\depot git\interfacegraphique\src\bouton.cpp
+	"Bouton.h"
+
+1524346700 g:\projet transverse\depot git\interfacegraphique\include\bouton.h
+	<stdlib.h>
+	<stdio.h>
+	<SDL/SDL.h>
+	<SDL/SDL_ttf.h>
+	<stdlib.h>
+	<stdio.h>
+
+1345860466 g:\projet transverse\depot git\interfacegraphique\include\stdio.h
+	<_mingw.h>
+	<stddef.h>
+	<stdarg.h>
+	<sys/types.h>
+
+1524080310 source:g:\projet transverse\depot git\interfacegraphique\src\menu.cpp
+	"Menu.h"
+
+1524082028 g:\projet transverse\depot git\interfacegraphique\include\menu.h
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<vector>
+	<SDL.h>
+	"Surface.h"
+
+1524078730 g:\projet transverse\depot git\interfacegraphique\include\surface.h
+
+1524081912 source:g:\projet transverse\depot git\interfacegraphique\src\surface.cpp
+	"Surface.h"
+
+1524348504 source:g:\projet transverse\depot git\interfacegraphique\main.cpp
+	<iostream>
+	<stdlib.h>
+	<SDL/SDL.h>
+	<SDL/SDL_ttf.h>
+	"Bouton.h"
+	<string>
+
