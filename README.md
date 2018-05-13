@@ -22,6 +22,8 @@ Règles:
 Pour activer le mode diagnostic qui montre plus en détail les choix de l'IA, il faut changer la valeur booléene dans le constructeur.
 Pour créer un scénario prédéfini pour tester l'IA, il faut modifier le bloc en commentaire dans le fichier principal.
 
+Pour la compilation, il se peut qu'il faut mettre tous les fichiers dans un projet d'IDE tel que CodeBlocks.
+
 Interface graphique:
 
 Cette interface n'est pas encore reliée au jeu.
