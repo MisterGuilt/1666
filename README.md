@@ -31,7 +31,12 @@ Elle permet de tester la défausse (cliquer sur la 4éme carte) et l'échange de
 
 Pour compiler l'interface graphique, il faut avoir installé la SDL 1.2 (64 bits) et le plugin SDL_ttf
 
-Compilateur utilisé: minGW/GNU GCC avec comme options (linker settings)
+Compilateur utilisé: minGW/GNU GCC avec comme options:
+
+Flags:
+-std=c++11
+
+Linker settings:
 -lmingw32
 -lSDLmain
 -lSDL
