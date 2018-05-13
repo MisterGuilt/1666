@@ -34,3 +34,5 @@ Compilateur utilisé: minGW/GNU GCC avec comme options (linker settings)
 -lSDLmain
 -lSDL
 -lSDL_ttf
+
+Si problème avec to_string lors de la compilation, il existe un patch: http://tehsausage.com/mingw-to-string
