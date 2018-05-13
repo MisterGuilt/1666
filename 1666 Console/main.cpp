@@ -15,7 +15,7 @@ int main()
     chiffres.melange();
     Joueur utilisateur(chiffres, figures);
     Adversaire ordinateur(chiffres, figures);
-    int nombreTours = 1;
+    int nombreTours = 0;
     bool jeuEnCours = true;
     int tourJoueur = 0;
 
