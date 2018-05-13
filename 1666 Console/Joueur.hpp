@@ -13,6 +13,8 @@ class Joueur
         Carte tete; //La figure
         Carte jeu[4]; //Les chiffres
         int points;
+        int limiteFigure;
+        int cooldownSpecial;
         std::vector<Carte> figuresGagnees;
 
         int getDateEnMain();
@@ -48,6 +50,7 @@ class Joueur
         int getPoints();
         void soitMaudit(bool ordre, bool diable);
         void changerCarte(int numero, Carte nouvelle);
+        void changerFigure(Carte nouvelle);
         virtual ~Joueur() {}
 };
 

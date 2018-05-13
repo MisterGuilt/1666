@@ -5,7 +5,6 @@
 #include "Adversaire.hpp"
 #include "console.hpp"
 
-
 using namespace std;
 
 int main()
@@ -20,6 +19,17 @@ int main()
     bool jeuEnCours = true;
     int tourJoueur = 0;
 
+    //Pour les scenarios personnalises
+    /*Carte c0(0, COEUR);
+    ordinateur.changerCarte(0, c0);
+    Carte c1(1, COEUR);
+    ordinateur.changerCarte(1, c1);
+    Carte c2(2, COEUR);
+    ordinateur.changerCarte(2, c2);
+    Carte c3(3, COEUR);
+    ordinateur.changerCarte(3, c3);
+    Carte fig(10 + VALET, COEUR);
+    ordinateur.changerFigure(fig);*/
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     do
     {
@@ -34,6 +44,8 @@ int main()
         utilisateur.afficherTete();
         gotoxy(1, 3);
         utilisateur.afficherMain();
+        gotoxy(1, 4);
+        cout << "Points: " << utilisateur.getPoints();
         gotoxy(30, 1);
         SetConsoleTextAttribute(hConsole, 11);
         cout << "Ordinateur :";
@@ -41,16 +53,16 @@ int main()
         ordinateur.afficherTete();
         gotoxy(30, 3);
         ordinateur.afficherMain();
-        gotoxy(0, 5);
+        gotoxy(30, 4);
+        cout << "Points: " << ordinateur.getPoints();
+        gotoxy(0, 6);
         SetConsoleTextAttribute(hConsole, 15);
         cout << " Defausse : ";
         if(defausse.pileVide()) cout << "_";
         else defausse.afficherCarteDessus();
         gotoxy(0, 7);
-        /*figures.afficher();
-        cout << endl;
-        chiffres.afficher();
-        cout << endl;*/
+        cout << " Chiffres restants: " << chiffres.getSize() << " - Figures restantes: " << figures.getSize();
+        gotoxy(0, 9);
         if(nombreTours % 2 == tourJoueur)
         {
             SetConsoleTextAttribute(hConsole, 10);
@@ -60,8 +72,9 @@ int main()
         else
         {
             SetConsoleTextAttribute(hConsole, 11);
-            cout << " Attend ton tour" << endl;
+            cout << " Tour de l'ordinateur" << endl;
             jeuEnCours = ordinateur.action(chiffres, figures, defausse, utilisateur);
+            Sleep(3000);
         }
         cout << endl;
         nombreTours++;

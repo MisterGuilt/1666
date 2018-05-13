@@ -49,6 +49,18 @@ Carte PaquetCartes::enleverCarteDessus()
     pile.erase(pile.begin());
     return c;
 }
+
+Carte PaquetCartes::retournerCarteDessus()
+{
+    if(pile.size() != 0)
+    {
+        Carte c = pile[0];
+        return c;
+    }
+    Carte c2;
+    return c2;
+}
+
 void PaquetCartes::ajouterCarteDessous(Carte c)
 {
     pile.push_back(c);
@@ -103,4 +115,9 @@ void PaquetCartes::renouvelerPaquets(PaquetCartes& defausse) //Remet toute la de
 void PaquetCartes::viderPaquet()
 {
     pile.clear();
+}
+
+int PaquetCartes::getSize()
+{
+    return pile.size();
 }

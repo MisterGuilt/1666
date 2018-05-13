@@ -13,6 +13,7 @@ class PaquetCartes
         PaquetCartes(int _type);
         void melange();
         Carte enleverCarteDessus();
+        Carte retournerCarteDessus();
         void ajouterCarteDessous(Carte c);
         void ajouterCarteDessus(Carte c);
         bool pileVide();
@@ -21,6 +22,7 @@ class PaquetCartes
         void afficherCarteDessus();
         void renouvelerPaquets(PaquetCartes& defausse);
         void viderPaquet();
+        int getSize();
 };
 
 #endif // PAQUETCARTES

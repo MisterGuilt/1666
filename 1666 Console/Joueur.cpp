@@ -2,9 +2,8 @@
 
 using namespace std;
 
-Joueur::Joueur(PaquetCartes& pioche, PaquetCartes& figures) : tete(), points(0), figuresGagnees()
+Joueur::Joueur(PaquetCartes& pioche, PaquetCartes& figures) : tete(), points(0), limiteFigure(2), cooldownSpecial(0), figuresGagnees()
 {
-    points = 0;
     for(int i = 0; i < 4; i++) //Piocher 4 chiffres
     {
         jeu[i] = pioche.enleverCarteDessus();
@@ -360,8 +359,8 @@ void Joueur::recupererDefausse(PaquetCartes& defausse)
 void Joueur::changerFigure(PaquetCartes& piocheFigures)
 {
     Carte c = piocheFigures.enleverCarteDessus();
-    //piocheFigures.ajouterCarteDessous(tete);
     tete = c;
+    limiteFigure--;
 }
 void Joueur::intervertirCartesVisibles()
 {
@@ -399,7 +398,7 @@ void Joueur::revelerJeu(PaquetCartes& pioche, PaquetCartes& piocheFigures, Joueu
             points += 100; //Gain de la partie
             piocheFigures.viderPaquet();
         }
-        if(vecteurVrai(verifierDesordre()))
+        else if(vecteurVrai(verifierDesordre()))
         {
             ennemi.soitMaudit(false, true);
             figuresGagnees.push_back(tete);
@@ -407,8 +406,8 @@ void Joueur::revelerJeu(PaquetCartes& pioche, PaquetCartes& piocheFigures, Joueu
     }
     else if(!tete.estJoker())
     {
-        if(vecteurVrai(verifierFigure())) points += tete.getValeur();
-        else if(vecteurVrai(verifierDesordre())) points += tete.getValeur() - 3;
+        if(vecteurVrai(verifierFigure())) points += tete.getPoints();
+        else if(vecteurVrai(verifierDesordre())) points += tete.getPoints() - 3;
         figuresGagnees.push_back(tete);
     }
     else if(vecteurVrai(verifierDatesMaudites()))
@@ -427,6 +426,7 @@ void Joueur::revelerJeu(PaquetCartes& pioche, PaquetCartes& piocheFigures, Joueu
     }
     tete = piocheFigures.enleverCarteDessus();
     changerJeu(pioche);
+    limiteFigure++;
 }
 
 bool Joueur::action(PaquetCartes& pioche, PaquetCartes& piocheFigures, PaquetCartes& defausse, Joueur& ennemi)
@@ -448,6 +448,7 @@ bool Joueur::action(PaquetCartes& pioche, PaquetCartes& piocheFigures, PaquetCar
         possedeDateMaudite = vecteurVrai(verifierDatesMaudites());
         if(!possedeDateMaudite) possedeDateMaudite = vecteurVrai(verifierDatesMauditesDesordre());
     }
+    if(cooldownSpecial != 0) cooldownSpecial--;
     do
     {
         cout << " 0) Quitter le jeu" << endl;
@@ -455,19 +456,20 @@ bool Joueur::action(PaquetCartes& pioche, PaquetCartes& piocheFigures, PaquetCar
         if(!defausse.pileVide()) cout << " 2) Recuperer la derniere carte jetee" << endl;
         cout << " 3) Intervertir les cartes visibles" << endl;
         cout << " 4) Intervertir les cartes cachees" << endl;
-        cout << " 5) Changer la figure" << endl;
+        cout << " 5) Changer la figure (Changements restants: " << limiteFigure << ")" << endl;
         if(reveleMain || possedeDateMaudite) cout << " 6) Attaque !" << endl;
-        if(peutPerturberRangsEnnemis) cout << " 7) Perturbe les rangs ennemis !" << endl;
-        if(peutEchangerUnites) cout << " 8) Echange une de tes cartes avec ton adversaire !" << endl;
-        if(peutAssassiner) cout << " 9) Force ton adversaire a jeter une carte !" << endl;
+        if(peutPerturberRangsEnnemis) cout << " 7) Perturbe les rangs ennemis (Cooldown: " << cooldownSpecial << ")!" << endl;
+        if(peutEchangerUnites) cout << " 8) Echange une de tes cartes avec ton adversaire (Cooldown: " << cooldownSpecial << ")!" << endl;
+        if(peutAssassiner) cout << " 9) Force ton adversaire a jeter une carte (Cooldown: " << cooldownSpecial << ")!" << endl;
         cout << " Que faire ? ";
         choix = saisie();
         if(choix >= 0 && choix <= 5) boucleWhile = false;
         if(choix == 2 && defausse.pileVide()) boucleWhile = true;
+        if(choix == 5 && limiteFigure == 0) boucleWhile = true;
         if(choix == 6 && (reveleMain || possedeDateMaudite)) boucleWhile = false;
-        if(choix == 7 && peutPerturberRangsEnnemis) boucleWhile = false;
-        if(choix == 8 && peutEchangerUnites) boucleWhile = false;
-        if(choix == 9 && peutAssassiner) boucleWhile = false;
+        if(choix == 7 && peutPerturberRangsEnnemis && cooldownSpecial == 0) boucleWhile = false;
+        if(choix == 8 && peutEchangerUnites && cooldownSpecial == 0) boucleWhile = false;
+        if(choix == 9 && peutAssassiner && cooldownSpecial == 0) boucleWhile = false;
     }while(boucleWhile);
 
     if(choix == 0) return false;
@@ -515,6 +517,11 @@ void Joueur::changerCarte(int numero, Carte nouvelle)
     jeu[numero] = nouvelle;
 }
 
+void Joueur::changerFigure(Carte nouvelle)
+{
+    tete = nouvelle;
+}
+
 void Joueur::echangerCarteDansMain(int numero1, int numero2)
 {
     Carte temporaire = jeu[numero1];
@@ -526,13 +533,13 @@ void Joueur::soitMaudit(bool ordre, bool diable)
 {
     if(!diable)
     {
-        if(ordre) points -= 6;
-        else points -= 4;
+        if(ordre) points -= 5;
+        else points -= 3;
     }
     else
     {
-        if(ordre) points -= 10;
-        else points -= 8;
+        if(ordre) points -= 7;
+        else points -= 5;
     }
 }
 
@@ -614,6 +621,7 @@ void Joueur::perturberRangsEnnemis(Joueur& ennemi)
     Carte c = ennemi.getCarte(carte1);
     ennemi.changerCarte(carte1, ennemi.getCarte(carte2));
     ennemi.changerCarte(carte2, c);
+    cooldownSpecial = 3;
 }
 
 void Joueur::echangerUnites(Joueur& ennemi)
@@ -634,6 +642,7 @@ void Joueur::echangerUnites(Joueur& ennemi)
     Carte c = ennemi.getCarte(carte1);
     ennemi.changerCarte(carte1, jeu[carte2]);
     jeu[carte2] = c;
+    cooldownSpecial = 3;
 }
 
 void Joueur::assassinat(Joueur& ennemi, PaquetCartes& pioche, PaquetCartes& defausse)
@@ -647,6 +656,7 @@ void Joueur::assassinat(Joueur& ennemi, PaquetCartes& pioche, PaquetCartes& defa
 
     defausse.ajouterCarteDessus(ennemi.getCarte(carte));
     ennemi.changerCarte(carte, pioche.enleverCarteDessus());
+    cooldownSpecial = 3;
 }
 
 bool Joueur::vecteurVrai(vector<int> vec)
