@@ -3,7 +3,7 @@
 #include <stdlib.h>
 //#include <stdio.h>
 #include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL_ttf.h>
 #include <time.h>
 #include <string>
 #define HAUTEUR 600
@@ -13,11 +13,12 @@
 
 using namespace std;
 
-void main_du_joueur(int * ,int *,int *, int *,int *);
+void main_du_joueur(int * ,int *,int *, int *,int *,int *);
 void initialiserImageCartes(SDL_Surface **);
 void affichageCartes(SDL_Surface **,SDL_Rect *, SDL_Surface *,int *,int *, int *);
 void affichage_Plateau(SDL_Surface *);
 int page_principale_processing(SDL_Rect *,SDL_Surface*, int*, int*,int*, int*);
+void EventProcessing2(SDL_Rect *,SDL_Surface *,int *,int *,int *, int *,int *,int,SDL_Surface **);
 
 int page_principale(SDL_Surface* screen,int event2)
 {
@@ -49,7 +50,6 @@ int page_principale(SDL_Surface* screen,int event2)
     positionB.x = 50;
     positionB.y = 190;
     SDL_SetColorKey(bouton_Exit, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Principal->format, 255, 127, 39));  ///transparence bouton de jeu
-
 
     SDL_Rect position_Titre;
     position_Titre.x= 150;
@@ -109,7 +109,6 @@ int random_Card_Figure(int index,int *cpt)     //ca genere une carte aléatoireme
           }
           first = 1;
        }
-   //index = (int)(rand() / RAND_MAX * (50 - 1));
    int ok=0;
     do
         {
@@ -122,33 +121,112 @@ int random_Card_Figure(int index,int *cpt)     //ca genere une carte aléatoireme
         } while (ok==0);
    return j;
 }
+void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_precedente,int *carte_actuel,int *carte_pioche, int *tour,int *click_defausse,int *click_switch,SDL_Surface **image_Cartes)
+{
+    //int continuerTour=1;
+    SDL_Event event2;
+    SDL_Rect ptr_position2;
+
+    ostringstream oss;
+    TTF_Font *police3 = NULL;
+    police3 = TTF_OpenFont("monof55.ttf", 24);           // Chargement de la police
+    SDL_Surface *texte_Cpt_NbTour;
+    SDL_Rect position_cpt_NbTour;       ///affichage du numero du tour a l ecran
+    position_cpt_NbTour.x=920;
+    position_cpt_NbTour.y=200;
+    *tour=45;
+    oss<<"Tour : "<<(*tour);
+    texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
+    SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
+
+    int evenement_non_trouve=1;
+    int switch1=0;
+    int defausse=0;
+    while (evenement_non_trouve)
+    {
+        SDL_WaitEvent(&event2);
+        if (event2.type == SDL_MOUSEBUTTONUP)                        //SDL_MOUSEMOTION)
+        {
+            ptr_position2.x = event2.button.x;
+            ptr_position2.y = event2.button.y;
+            if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[3]))
+            {
+                *tour=1;                                            ///click sur la defausse
+                defausse=4;
+                switch1=0;                                               ///le joueur choisie de se separer de la 4eme carte
+                oss<<"Tour : "<<(*tour);
+                texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
+                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
+                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
+                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                click_defausse[3]=0;
+                evenement_non_trouve=0;
+            }
+            else if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[2]))
+            {
+                *tour=1;
+                defausse=3;
+                switch1=0;
+                oss<<"Tour : "<<(*tour);
+                texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
+                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
+                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
+                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                click_defausse[2]=0;
+                evenement_non_trouve=0;
+            }
+            else if (ptr_position2.x>650&&ptr_position2.x<7450&&ptr_position2.y>410&&ptr_position2.y<530&&(*click_switch))
+            {
+                *tour=1;            ///click sur la 3eme carte
+                defausse=0;     ///si switch1==1 et defausse egal a 0 on permute les cartes du joueur
+                switch1=1;
+                //oss<<"Tour : "<<(*tour);
+                //texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
+                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
+                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
+                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                *click_switch=0;
+                evenement_non_trouve=0;
+            }
+            else if (ptr_position2.x<500&&ptr_position2.y>280&&ptr_position2.y<400&&click_defausse[4]) ///change de figure  ptr_position2.x>370&&
+            {
+                *tour=1;
+                switch1=2;
+                defausse=0;
+                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
+                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
+                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                click_defausse[4]=0;
+                evenement_non_trouve=0;
+            }
+        }
+        SDL_PollEvent(&event2);
+    }
+    //SDL_PollEvent(&event);
+    SDL_Flip(ptr_screen);
+}
 
 int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_precedente,int *carte_actuel,int *carte_pioche, int *tour)
 {
-
-    SDL_Surface *texte_Cpt_NbTour;
-    TTF_Font *police3 = NULL;
-    police3 = TTF_OpenFont("monof55.ttf", 24);           // Chargement de la police
-    SDL_Rect position_cpt_NbTour;
-    position_cpt_NbTour.x=240;
-    position_cpt_NbTour.y=420;
-    ostringstream oss;
-    int switch1=0;
-
     SDL_Surface *image_Cartes[52];
     initialiserImageCartes(image_Cartes);
     int continuer=1;
     SDL_Event event;
-    int continuerTour=1;
     affichage_Plateau(ptr_screen);
     affichageCartes(image_Cartes,ptr_position, ptr_screen, carte_precedente, carte_actuel, tour);
-    texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
-    oss<<"Tour : "<<(*tour);
-    texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
-    SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
+
+    SDL_Surface *dates=NULL;
+    SDL_Rect position_image_dates;
+    position_image_dates.x=400;
+    position_image_dates.y=0;
+    dates=SDL_LoadBMP ("dates3.bmp");
+
+    int click_defausse[5];
+    SDL_Rect ptr_position1;
+    int click_switch=0;
     while (continuer)
     {
-        SDL_WaitEvent(&event); // On attend un événement qu'on récupère dans event
+        SDL_WaitEvent(&event);
         switch(event.type) // On teste le type d'événement
         {
             case SDL_QUIT: // Si c'est un événement QUITTER
@@ -175,75 +253,55 @@ int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_pr
                 }
                 break;
             case SDL_MOUSEBUTTONUP:
-                ptr_position->x = event.button.x;           ///postion de d'une carte
-                ptr_position->y = event.button.y;
-// si clic sur boutton
-                if (event.button.y > 20 && event.button.y <= 50  && event.button.x > 1000 && event.button.x <= 1090)    //bouton arrrêt
-                    {
-                        //SDL_Delay(500);
-                        return 0;
-                        //continuer = 0;
-                    }
-                while (continuerTour)
-                    {
-                        continuerTour=1;
-                        SDL_WaitEvent(&event);
-                        ptr_position->x = event.button.x;
-                        ptr_position->y = event.button.y;
-                        if(event.type == SDL_MOUSEBUTTONUP)//SDL_MOUSEMOTION)
-                        {
-                            if (SDL_MOUSEBUTTONUP&&(ptr_position->x>750&&ptr_position->x<820&&ptr_position->y>410&&ptr_position->y<530))   ///le joueur a cliqué sur la carte à jouer
-                            {
-                                *tour=1;
-                                switch1=0;
-                                //oss<<"Tour : "<<(*tour);
-                                //texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
-                                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
-                                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1);
-                                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
-                                //SDL_Flip(ptr_screen);
-                                SDL_PollEvent(&event);
-                                continuerTour=0;
-                            }
-                            else if (SDL_MOUSEBUTTONUP&&(ptr_position->x>650&&ptr_position->x<745&&ptr_position->y>410&&ptr_position->y<530))
-                            {
-                                *tour=1;
-                                switch1=1;
-                                //oss<<"Tour : "<<(*tour);
-                                //texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
-                                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
-                                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1);
-                                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
-                                //SDL_Flip(ptr_screen);
-                                continuerTour=0;
-                            }
-                            else if (SDL_MOUSEBUTTONUP&&(ptr_position->x>930&&ptr_position->x<1050&&ptr_position->y>410&&ptr_position->y<530))
-                            {
-                                *tour=1;
-                                switch1=2;
-                                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
-                                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1);
-                                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
-                                continuerTour=0;
-                            }
-                            else if (ptr_position->x>930&&ptr_position->x<1050&&ptr_position->y>20&&ptr_position->y<100)
-                            {
-                                continuerTour=1;
-                            }
-                        }
-                        //SDL_PollEvent(&event);
-                        SDL_Flip(ptr_screen);
-                    }
-                    break;
-            default :
+                ptr_position1.x = event.button.x;           ///postion d'une carte
+                ptr_position1.y = event.button.y;
+                for (int i=0;i<5;i++)
+                {
+                    click_defausse[i]=0;
+                }
+                if (event.button.y > 20 && event.button.y <= 50  && event.button.x > 1030 && event.button.x <= 1090)    ///bouton arrrêt
+                {
+                    return 0;
+                }
+                else if (event.button.x>950&&event.button.x<1030&&event.button.y>20&&event.button.y<=50)    ///affichage des dates a avoir
+                {
+                    SDL_SetColorKey(dates, SDL_SRCCOLORKEY, SDL_MapRGB(dates->format, 255, 242, 0));
+                    SDL_BlitSurface (dates, NULL ,ptr_screen, &position_image_dates);
+                    //SDL_Delay(2000);
+                    //EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
+                    SDL_Flip(ptr_screen);
+                    //SDL_PollEvent(&event);
+                }
+                else if (ptr_position1.x>750&&ptr_position1.x<820&&ptr_position1.y>410&&ptr_position1.y<530)    ///4eme cartes du joueur
+                {
+                    click_defausse[3]=1;
+                    click_switch =1;
+                    EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
+                    click_switch =0;
+                    //SDL_PollEvent(&event);
+                }
+                else if (ptr_position1.x>650&&ptr_position1.x<745&&ptr_position1.y>410&&ptr_position1.y<530)     ///3eme cartes
+                {
+                    click_defausse[2]=1;
+                    click_switch =0;
+                    EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
+                    //SDL_PollEvent(&event);
+                }
+                else if (ptr_position1.x>900&&ptr_position1.x<1050&&ptr_position1.y>410&&ptr_position1.y<530)       ///figure
+                {
+                    click_defausse[4]=1;
+                    click_switch =0;
+                    EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche,tour,click_defausse,&click_switch,image_Cartes);
+                    //SDL_PollEvent(&event);
+                }
                 break;
-            }
-            continuerTour=1;
+            //default :
+           //     break;
         }
+        SDL_PollEvent(&event);
+    }
     return 1;
 }
-
-
 
 void affichage_Plateau(SDL_Surface *screen)
 {
@@ -252,6 +310,19 @@ void affichage_Plateau(SDL_Surface *screen)
     SDL_Rect positionB2;
     positionB2.x=1030;
     positionB2.y=20;
+
+    SDL_Surface *bouton_Assaciner=NULL;
+    SDL_Surface *bouton_Echanger=NULL;
+    SDL_Surface *bouton_Perturber_rang=NULL;
+    SDL_Rect positionB3;
+    positionB3.x=30;
+    positionB3.y=500;
+    bouton_Assaciner=SDL_LoadBMP ("Assaciner.bmp");
+    bouton_Echanger=SDL_LoadBMP ("Echanger.bmp");
+    bouton_Perturber_rang=SDL_LoadBMP ("Perturber_rang.bmp");
+    SDL_SetColorKey(bouton_Assaciner, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Assaciner->format, 255, 242, 0));
+    SDL_SetColorKey(bouton_Echanger, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Echanger->format, 255, 242, 0));
+    SDL_SetColorKey(bouton_Perturber_rang, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Perturber_rang->format, 255, 242, 0));
 
     SDL_Surface *bouton_Date=NULL;
     bouton_Date=SDL_LoadBMP ("date.bmp");
@@ -274,6 +345,12 @@ void affichage_Plateau(SDL_Surface *screen)
     SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 210, 0));
     SDL_BlitSurface (bouton_Exit2, NULL ,screen, &positionB2);
     SDL_BlitSurface (bouton_Date, NULL ,screen, &position_Date);
+
+    SDL_BlitSurface (bouton_Assaciner, NULL ,screen, &positionB3);
+    positionB3.x=120;
+    SDL_BlitSurface (bouton_Echanger, NULL ,screen, &positionB3);
+    positionB3.x=200;
+    SDL_BlitSurface (bouton_Perturber_rang, NULL ,screen, &positionB3);
 
     SDL_Rect position_Rect;
     position_Rect.x=910;
@@ -449,7 +526,7 @@ void affichageCartes(SDL_Surface **image_Cartes, SDL_Rect *pos, SDL_Surface *scr
 }
 
 
-void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, int *tour, int *switch1)       /// initialise les cartes des joueurs en fonction du tour
+void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, int *tour, int *switch1,int *defausse)       /// initialise les cartes des joueurs en fonction du tour
 {
         if (*tour==0)
         {
@@ -458,7 +535,7 @@ void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, i
                carte_actuel[i]=random_Card(i,tour);
                carte_precedente[i]=carte_actuel[i];     //on récupere la main des joueurs pour permettre le retour en arriere
             }
-            for (int i=9;i<=10;i++)
+            for (int i=9;i<=10;i++)         ///on defausse la 3eme carte du joueur
             {
                carte_actuel[i]=random_Card_Figure(i,tour);
                carte_precedente[i]=carte_actuel[i];
@@ -469,19 +546,29 @@ void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, i
             (*tour)=(*tour)+1;
                 if (*switch1==0)
                 {
-                    carte_actuel[8]=carte_actuel[0];   ///la 11eme carte du plateau correspond a la defausse
-                    for (int i=0;i<=rand()%15;i++){
-                        carte_actuel[0]=random_Card(i,tour);
+                    if (*defausse==4)    ///4eme carte a defausser
+                    {
+                        carte_actuel[8]=carte_actuel[0];   ///la 11eme carte du plateau correspond a la defausse
+                        for (int i=0;i<=rand()%15;i++){
+                            carte_actuel[0]=random_Card(i,tour);
+                            }
+                    }
+                    if (*defausse==3)        ///3eme carte a defausser
+                    {
+                        carte_actuel[8]=carte_actuel[1];   ///la 11eme carte du plateau correspond a la defausse
+                        for (int i=0;i<=rand()%15;i++){
+                            carte_actuel[1]=random_Card(i,tour);
+                        }
                     }
                 }
-                else if (*switch1==1)       ///le joueur a cliqué sur sa 2eme carte => il veut switché ces cartes
+                else if (*switch1==1&&*defausse==0)       ///le joueur a cliqué sur sa 2eme carte => il veut switché ces cartes
                 {
                     carte_actuel[1]=carte_actuel[0];
                     carte_actuel[0]=carte_precedente[1];
                     carte_precedente[1]=carte_actuel[1];
                     carte_precedente[0]=carte_actuel[0];
                 }
-                else if (*switch1==2)   ///on change de figure
+                else if (*switch1==2&&*defausse==0)   ///on change de figure
                 {
                     for (int i=0;i<=rand()%15;i++)
                     {
@@ -494,7 +581,7 @@ void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, i
 
 int page_principale_processing(SDL_Rect *position,SDL_Surface *screen,int *carte_precedente,int *carte_actuel,int *carte_pioche,int *tour)
 {
-        main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,0);
+        main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,0,0);
         page_principale(screen,0);
         SDL_Event event;
         SDL_WaitEvent(&event);
