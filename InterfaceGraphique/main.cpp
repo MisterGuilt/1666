@@ -2,8 +2,9 @@
 #include <sstream>
 #include <stdlib.h>
 //#include <stdio.h>
+#include <SDL/SDL_mixer.h>
 #include <SDL/SDL.h>
-#include <SDL_ttf.h>
+#include <SDL/SDL_ttf.h>
 #include <time.h>
 #include <string>
 #define HAUTEUR 600
@@ -134,9 +135,11 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
     SDL_Rect position_cpt_NbTour;       ///affichage du numero du tour a l ecran
     position_cpt_NbTour.x=920;
     position_cpt_NbTour.y=200;
-    *tour=45;
+
     oss<<"Tour : "<<(*tour);
     texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
+    affichage_Plateau(ptr_screen);
+    affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
     SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
 
     int evenement_non_trouve=1;
@@ -151,12 +154,9 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             ptr_position2.y = event2.button.y;
             if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[3]))
             {
-                *tour=1;                                            ///click sur la defausse
+                *tour=1+*tour;                                            ///click sur la defausse
                 defausse=4;
                 switch1=0;                                               ///le joueur choisie de se separer de la 4eme carte
-                oss<<"Tour : "<<(*tour);
-                texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
-                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
                 main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
                 affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
                 click_defausse[3]=0;
@@ -164,40 +164,58 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             }
             else if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[2]))
             {
-                *tour=1;
+                *tour=1+*tour;
                 defausse=3;
                 switch1=0;
-                oss<<"Tour : "<<(*tour);
-                texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
-                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
                 main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
                 affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
                 click_defausse[2]=0;
                 evenement_non_trouve=0;
             }
-            else if (ptr_position2.x>650&&ptr_position2.x<7450&&ptr_position2.y>410&&ptr_position2.y<530&&(*click_switch))
+            else if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[1]))
             {
-                *tour=1;            ///click sur la 3eme carte
+                *tour=1+*tour;
+                defausse=2;
+                switch1=0;
+                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
+                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                click_defausse[1]=0;
+                evenement_non_trouve=0;
+            }
+            else if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[0]))
+            {
+                *tour=1+*tour;
+                defausse=1;
+                switch1=0;
+                main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
+                affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                click_defausse[1]=0;
+                evenement_non_trouve=0;
+            }
+            else if (ptr_position2.x>650&&ptr_position2.x<745&&ptr_position2.y>410&&ptr_position2.y<530&&(*click_switch))
+            {
+                *tour=1+*tour;              ///click sur la 3eme carte
                 defausse=0;     ///si switch1==1 et defausse egal a 0 on permute les cartes du joueur
                 switch1=1;
-                //oss<<"Tour : "<<(*tour);
-                //texte_Cpt_NbTour = TTF_RenderText_Blended(police3, oss.str().c_str(),  {255, 255, 255});
-                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
                 main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
                 affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
                 *click_switch=0;
                 evenement_non_trouve=0;
             }
-            else if (ptr_position2.x<500&&ptr_position2.y>280&&ptr_position2.y<400&&click_defausse[4]) ///change de figure  ptr_position2.x>370&&
+            else if (ptr_position2.x>480&&ptr_position2.x<630&&ptr_position2.y>280&&ptr_position2.y<400&&click_defausse[4]) ///change de figure  ptr_position2.x>370&&
             {
-                *tour=1;
+                *tour=1+*tour;
                 switch1=2;
                 defausse=0;
-                SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
+                //SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
                 main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,&switch1,&defausse);
                 affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
                 click_defausse[4]=0;
                 evenement_non_trouve=0;
+            }
+            else
+            {
+                evenement_non_trouve=1;
             }
         }
         SDL_PollEvent(&event2);
@@ -246,7 +264,6 @@ int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_pr
                         {
                             continuer=page_principale_processing(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche,tour);
                         }
-                        //return 0;
                         break;
                     default :
                         break;
@@ -267,32 +284,47 @@ int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_pr
                 {
                     SDL_SetColorKey(dates, SDL_SRCCOLORKEY, SDL_MapRGB(dates->format, 255, 242, 0));
                     SDL_BlitSurface (dates, NULL ,ptr_screen, &position_image_dates);
-                    //SDL_Delay(2000);
-                    //EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
+                    SDL_PollEvent(&event);
                     SDL_Flip(ptr_screen);
-                    //SDL_PollEvent(&event);
+                    SDL_WaitEvent(&event);
+                    if (event.button.x>950&&event.button.x<1030&&event.button.y>20&&event.button.y<=50)
+                    {
+                        affichage_Plateau(ptr_screen);
+                        affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                        SDL_Flip(ptr_screen);
+                    }
+                    //SDL_Delay(2000);
                 }
-                else if (ptr_position1.x>750&&ptr_position1.x<820&&ptr_position1.y>410&&ptr_position1.y<530)    ///4eme cartes du joueur
+                else if (ptr_position1.x>750&&ptr_position1.x<820&&ptr_position1.y>410&&ptr_position1.y<530)    ///4eme carte du joueur
                 {
                     click_defausse[3]=1;
                     click_switch =1;
                     EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
                     click_switch =0;
-                    //SDL_PollEvent(&event);
                 }
-                else if (ptr_position1.x>650&&ptr_position1.x<745&&ptr_position1.y>410&&ptr_position1.y<530)     ///3eme cartes
+                else if (ptr_position1.x>650&&ptr_position1.x<745&&ptr_position1.y>410&&ptr_position1.y<530)     ///3eme carte
                 {
                     click_defausse[2]=1;
                     click_switch =0;
                     EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
-                    //SDL_PollEvent(&event);
+                }
+                else if (ptr_position1.x>550&&ptr_position1.x<645&&ptr_position1.y>410&&ptr_position1.y<530)     ///2eme carte
+                {
+                    click_defausse[1]=1;
+                    click_switch =0;
+                    EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
+                }
+                else if (ptr_position1.x>450&&ptr_position1.x<545&&ptr_position1.y>410&&ptr_position1.y<530)     ///1ere carte
+                {
+                    click_defausse[0]=1;
+                    click_switch =0;
+                    EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche, tour,click_defausse,&click_switch,image_Cartes);
                 }
                 else if (ptr_position1.x>900&&ptr_position1.x<1050&&ptr_position1.y>410&&ptr_position1.y<530)       ///figure
                 {
                     click_defausse[4]=1;
                     click_switch =0;
                     EventProcessing2(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche,tour,click_defausse,&click_switch,image_Cartes);
-                    //SDL_PollEvent(&event);
                 }
                 break;
             //default :
@@ -541,9 +573,8 @@ void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, i
                carte_precedente[i]=carte_actuel[i];
             }
         }
-        if (*tour==1)
+        else
         {
-            (*tour)=(*tour)+1;
                 if (*switch1==0)
                 {
                     if (*defausse==4)    ///4eme carte a defausser
@@ -551,13 +582,31 @@ void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, i
                         carte_actuel[8]=carte_actuel[0];   ///la 11eme carte du plateau correspond a la defausse
                         for (int i=0;i<=rand()%15;i++){
                             carte_actuel[0]=random_Card(i,tour);
+                            carte_precedente[0]=carte_actuel[0];
                             }
                     }
-                    if (*defausse==3)        ///3eme carte a defausser
+                    else if (*defausse==3)        ///3eme carte a defausser
                     {
                         carte_actuel[8]=carte_actuel[1];   ///la 11eme carte du plateau correspond a la defausse
                         for (int i=0;i<=rand()%15;i++){
                             carte_actuel[1]=random_Card(i,tour);
+                            carte_precedente[1]=carte_actuel[1];
+                        }
+                    }
+                    else if (*defausse==2)        ///2eme carte a defausser
+                    {
+                        carte_actuel[8]=carte_actuel[2];   ///la 11eme carte du plateau correspond a la defausse
+                        for (int i=0;i<=rand()%15;i++){
+                            carte_actuel[2]=random_Card(i,tour);
+                            carte_precedente[2]=carte_actuel[2];
+                        }
+                    }
+                    else if (*defausse==1)        ///2eme carte a defausser
+                    {
+                        carte_actuel[8]=carte_actuel[3];   ///la 11eme carte du plateau correspond a la defausse
+                        for (int i=0;i<=rand()%15;i++){
+                            carte_actuel[3]=random_Card(i,tour);
+                            carte_precedente[3]=carte_actuel[3];
                         }
                     }
                 }
@@ -641,9 +690,18 @@ int main(int argc, char **argv)
     }*/
     //main_du_joueur(carte_precedente, carte_actuel, carte_pioche, &tour,0);
     screen = SDL_SetVideoMode(1100,600,16,SDL_HWSURFACE| SDL_RESIZABLE | SDL_DOUBLEBUF|SDL_FULLSCREEN);
+    SDL_WM_SetCaption("SDL_mixer",NULL);
     int cont=1;
+
+    if (Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,MIX_DEFAULT_CHANNELS,1024)==-1)
+    {
+        printf("%s",Mix_GetError());
+    }
+    Mix_Music *generique;
+    generique=Mix_LoadMUS("music.mp3");
     while (cont)
     {
+        Mix_PlayMusic(generique,-1);
         cont=page_principale_processing(&position,screen, carte_precedente, carte_actuel,carte_pioche, &tour);
     }
     if (screen == NULL)      // Si l'ouverture a échoué, on le note et on arrête
@@ -651,7 +709,8 @@ int main(int argc, char **argv)
         fprintf(stderr, "Impossible de charger le mode vidéo 2  : %s\n", SDL_GetError());
         exit(EXIT_FAILURE);
     }
-
+    Mix_FreeMusic(generique);
+    Mix_CloseAudio();
     //TTF_CloseFont(police);          // Doit être avant TTF_Quit()
     quit();
     return EXIT_SUCCESS;
