@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1526661204 source:c:\users\antho\desktop\prjttrans2\main.cpp
+	<iostream>
+	<sstream>
+	<stdlib.h>
+	<SDL/SDL.h>
+	<SDL_ttf.h>
+	<time.h>
+	<string>
+
