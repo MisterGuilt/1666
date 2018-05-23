@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Adversaire::Adversaire(PaquetCartes& pioche, PaquetCartes& figures) : Joueur(pioche, figures), priorite(0), modeDiagnostic(false), cartesCachees(true), memoire(), correctVerifie(), correctVerifieDesordre(), correctJoker(), correctJokerDesordre(), correctVerifieDiableDesordre(), correctVerifieMaudite(), correctVerifieMauditeDesordre() {}
+Adversaire::Adversaire(PaquetCartes& pioche, PaquetCartes& figures) : Joueur(pioche, figures), priorite(0), modeDiagnostic(false), cartesCachees(true), correctVerifie(), correctVerifieDesordre(), correctJoker(), correctJokerDesordre(), correctVerifieDiableDesordre(), correctVerifieMaudite(), correctVerifieMauditeDesordre() {}
 
 void Adversaire::piocher(PaquetCartes& pioche, PaquetCartes& defausse, int numeroCarte)
 {
@@ -20,14 +20,17 @@ int Adversaire::evaluerPriorite(Joueur& ennemi)
 {
     if(points == ennemi.getPoints())
     {
-        return 0;
+        if(tete.estJoker()) return 4;
+        else return 0;
     }
     else if(points < ennemi.getPoints())
     {
+        if(tete.estJoker()) return 5;
         return 1;
     }
     else if(points > ennemi.getPoints())
     {
+        if(tete.estJoker()) return 6;
         return 2;
     }
     return 0;
@@ -46,7 +49,10 @@ void Adversaire::choisirAction(PaquetCartes& pioche, PaquetCartes& piocheFigures
         revelerJeu(pioche, piocheFigures, ennemi);
         return;
     }
-    else if((nombreCorrectVecteur(correctVerifie) < nombreCorrectVecteur(correctVerifieDesordre) && vecteurVrai(correctVerifieDesordre)) || (nombreCorrectVecteur(correctVerifieMaudite) < nombreCorrectVecteur(correctVerifieMauditeDesordre) && vecteurVrai(correctVerifieMauditeDesordre))) //Possibilite de transformer une main desordre valide en main ordre valide par echange
+    else if((nombreCorrectVecteur(correctVerifie) < nombreCorrectVecteur(correctVerifieDesordre)
+             && vecteurVrai(correctVerifieDesordre))
+            || (nombreCorrectVecteur(correctVerifieMaudite) < nombreCorrectVecteur(correctVerifieMauditeDesordre)
+                && vecteurVrai(correctVerifieMauditeDesordre))) //Possibilite de transformer une main desordre valide en main ordre valide par echange
     {
         if(modeDiagnostic) cout << "Test echange" << endl;
         for(int i = 0; i < 4; i++)
@@ -877,6 +883,761 @@ void Adversaire::choisirAction(PaquetCartes& pioche, PaquetCartes& piocheFigures
                 jeu[carteCible] = carteDefausse;
                 correctVerifieDesordre = verifierDesordre();
                 if(nombreCorrectVecteur(correctVerifieDesordre) > 1) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            break;
+        }
+        case 4:
+        {
+            if(nombreCorrectVecteur(correctJoker) == 0 && nombreCorrectVecteur(correctJokerDesordre) == 0) //On est le plus eloigne d'une main valide
+            {
+                if(modeDiagnostic) cout << "Main sans valeur" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                scorePrecedent = nombreCorrectVecteur(correctJokerDesordre);
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(nombreCorrectVecteur(correctJokerDesordre) > scorePrecedent) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJoker) == 3) //Tres proche d'une main ordre
+            {
+                if(modeDiagnostic) cout << "Verifie ordre = 3" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                correctJoker = verifierFigure();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJoker[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                if(vecteurVrai(correctJoker)) //La defausse permet de completer la main
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJokerDesordre) == 3) //Tres proche d'une main desordre
+            {
+                if(modeDiagnostic) cout << "Verifie desordre = 3" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(vecteurVrai(correctJokerDesordre)) //La defausse permet de completer la main
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJoker) == 2) //Proche d'une main ordre
+            {
+                if(modeDiagnostic) cout << "Verifie ordre = 2" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJoker[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJoker = verifierFigure();
+                if(nombreCorrectVecteur(correctJoker) > 2) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJokerDesordre) == 2) //Proche d'une main desordre
+            {
+                if(modeDiagnostic) cout << "Verifie desordre = 2" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(nombreCorrectVecteur(correctJokerDesordre) > 2) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJoker) == 1) //Loin d'une main ordre
+            {
+                if(modeDiagnostic) cout << "Verifie ordre = 1" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJoker[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJoker = verifierFigure();
+                if(nombreCorrectVecteur(correctJoker) > 1) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else //Loin d'une main desordre
+            {
+                if(modeDiagnostic) cout << "Verifie desordre = 1" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(nombreCorrectVecteur(correctJokerDesordre) > 1) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            break;
+        }
+        case 5: //Priorite aux dates maudites proches, puis aux mains sans valeur, puis aux mains proches
+        {
+            if(nombreCorrectVecteur(correctVerifieMaudite) >= 2) //Proche d'une date maudite ordre
+            {
+                if(modeDiagnostic) cout << "Verifie maudite ordre = 2+" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctVerifieMaudite[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                scorePrecedent = nombreCorrectVecteur(correctVerifieMaudite);
+                jeu[carteCible] = carteDefausse;
+                correctVerifieMaudite = verifierDatesMaudites();
+                if(nombreCorrectVecteur(correctVerifieMaudite) > scorePrecedent) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctVerifieMauditeDesordre) >= 2) //Proche d'une date maudite desordre
+            {
+                if(modeDiagnostic) cout << "Verifie maudite desordre = 2+" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctVerifieMauditeDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                scorePrecedent = nombreCorrectVecteur(correctVerifieMauditeDesordre);
+                jeu[carteCible] = carteDefausse;
+                correctVerifieMauditeDesordre = verifierDatesMauditesDesordre();
+                if(nombreCorrectVecteur(correctVerifieMauditeDesordre) > scorePrecedent) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJoker) == 0 && nombreCorrectVecteur(correctJokerDesordre) == 0) //On est le plus eloigne d'une main valide
+            {
+                if(modeDiagnostic) cout << "Main sans valeur" << endl;
+                if(limiteFigure > 0)
+                {
+                    cout << " Changement de figure" << endl;
+                    changerFigure(piocheFigures);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        copieJeu[i] = jeu[i];
+                    }
+                    carteDefausse = defausse.retournerCarteDessus();
+                    for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                    {
+                        if(correctJokerDesordre[i] == 0)
+                        {
+                            carteCible = i;
+                        }
+                    }
+                    scorePrecedent = nombreCorrectVecteur(correctJokerDesordre);
+                    jeu[carteCible] = carteDefausse;
+                    correctJokerDesordre = verifierDesordre();
+                    if(nombreCorrectVecteur(correctJokerDesordre) > scorePrecedent) //La defausse permet d'avoir une carte valide
+                    {
+                        for(int i = 0; i < 4; i++)
+                        {
+                            jeu[i] = copieJeu[i];
+                        }
+                        cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                        recupererDefausse(defausse, carteCible);
+                        return;
+                    }
+                    else
+                    {
+                        for(int i = 0; i < 4; i++)
+                        {
+                            jeu[i] = copieJeu[i];
+                        }
+                        cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                        piocher(pioche, defausse, carteCible);
+                        return;
+                    }
+                }
+            }
+            else if(nombreCorrectVecteur(correctJoker) >= 2) //Proche d'une main ordre
+            {
+                if(modeDiagnostic) cout << "Verifie ordre = 2" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJoker[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                scorePrecedent = nombreCorrectVecteur(correctJoker);
+                jeu[carteCible] = carteDefausse;
+                correctJoker = verifierFigure();
+                if(nombreCorrectVecteur(correctJoker) > scorePrecedent) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else //Loin d'une main desordre
+            {
+                if(modeDiagnostic) cout << "Verifie desordre = 2-" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                scorePrecedent = nombreCorrectVecteur(correctJokerDesordre);
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(nombreCorrectVecteur(correctJokerDesordre) > scorePrecedent) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            break;
+        }
+        case 6: //Priorites aux mains tres proches, peu importe leur effet. Sinon, esssayer de defausser une figure. Si changements epuises, assumer l'ordre de la priorite 0
+        {
+            if(nombreCorrectVecteur(correctJoker) == 3) //Tres proche d'une main ordre, donc on peut facilement se debarasser d'une figure avec des benefices
+            {
+                if(modeDiagnostic) cout << "Verifie ordre = 3" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                correctJoker = verifierFigure();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJoker[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                if(vecteurVrai(correctJoker)) //La defausse permet de completer la main
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJokerDesordre) == 3) //Tres proche d'une main desordre
+            {
+                if(modeDiagnostic) cout << "Verifie desordre = 3" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(vecteurVrai(correctJokerDesordre)) //La defausse permet de completer la main
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctVerifieMauditeDesordre) == 3) //Tres proche d'une date maudite desordre
+            {
+                if(modeDiagnostic) cout << "Verifie maudit desordre = 3" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctVerifieMauditeDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctVerifieMauditeDesordre = verifierDesordre();
+                if(vecteurVrai(correctVerifieMauditeDesordre)) //La defausse permet de completer la main
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(limiteFigure > 0) //Gaspillage de figure
+            {
+                if(modeDiagnostic) cout << " Changement de figure" << endl;
+                changerFigure(piocheFigures);
+                return;
+            }
+            else if(nombreCorrectVecteur(correctJoker) == 2) //Proche d'une main ordre
+            {
+                if(modeDiagnostic) cout << "Verifie ordre = 2" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJoker[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJoker = verifierFigure();
+                if(nombreCorrectVecteur(correctJoker) > 2) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJokerDesordre) == 2) //Proche d'une main desordre
+            {
+                if(modeDiagnostic) cout << "Verifie deordre = 2" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(nombreCorrectVecteur(correctJokerDesordre) > 2) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else if(nombreCorrectVecteur(correctJoker) == 1) //Loin d'une main ordre
+            {
+                if(modeDiagnostic) cout << "Verifie ordre = 1" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJoker[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJoker = verifierFigure();
+                if(nombreCorrectVecteur(correctJoker) > 1) //La defausse permet d'avoir une carte valide
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche dans la defausse, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    recupererDefausse(defausse, carteCible);
+                    return;
+                }
+                else
+                {
+                    for(int i = 0; i < 4; i++)
+                    {
+                        jeu[i] = copieJeu[i];
+                    }
+                    cout << " Pioche, la carte "; jeu[carteCible].afficher(); cout << " est defaussee" << endl;
+                    piocher(pioche, defausse, carteCible);
+                    return;
+                }
+            }
+            else //Loin d'une main desordre
+            {
+                if(modeDiagnostic) cout << "Verifie desordre = 0" << endl;
+                for(int i = 0; i < 4; i++)
+                {
+                    copieJeu[i] = jeu[i];
+                }
+                carteDefausse = defausse.retournerCarteDessus();
+                for(unsigned int i = 0; i < 4; i++) //Choisir quelle carte on veut remplacer
+                {
+                    if(correctJokerDesordre[i] == 0)
+                    {
+                        carteCible = i;
+                    }
+                }
+                jeu[carteCible] = carteDefausse;
+                correctJokerDesordre = verifierDesordre();
+                if(nombreCorrectVecteur(correctJokerDesordre) > 1) //La defausse permet d'avoir une carte valide
                 {
                     for(int i = 0; i < 4; i++)
                     {

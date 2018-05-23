@@ -22,13 +22,13 @@ int main()
     //Pour les scenarios personnalises
     /*Carte c0(0, COEUR);
     ordinateur.changerCarte(0, c0);
-    Carte c1(1, COEUR);
+    Carte c1(8, COEUR);
     ordinateur.changerCarte(1, c1);
-    Carte c2(2, COEUR);
+    Carte c2(0, COEUR);
     ordinateur.changerCarte(2, c2);
-    Carte c3(3, COEUR);
+    Carte c3(0, COEUR);
     ordinateur.changerCarte(3, c3);
-    Carte fig(10 + VALET, COEUR);
+    Carte fig(10 + ROI, COEUR);
     ordinateur.changerFigure(fig);*/
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     do
@@ -79,7 +79,7 @@ int main()
         cout << endl;
         nombreTours++;
         if(chiffres.pileVide()) chiffres.renouvelerPaquets(defausse);
-    }while(!figures.pileVide() && jeuEnCours);
+    }while((figures.getSize() > 0) && jeuEnCours);
     SetConsoleTextAttribute(hConsole, 15);
     cout << " Fin du jeu" << endl;
     if(utilisateur.getPoints() > ordinateur.getPoints()) cout << " Victoire !!" << endl;

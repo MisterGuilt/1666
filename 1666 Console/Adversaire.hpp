@@ -13,11 +13,13 @@ class Adversaire : public Joueur{
             Elle peut aussi essayer des mains qui retirent des points au joueur si elles sont faisables.
             Choisie lorsque le joueur a plus de points que l'IA
             2: Expedier le jeu. L'IA va essayer de reduire le nombre de figures afin de terminer le jeu plus vite. Choisie lorsque l'IA a un avantage de points
-            3: Perturber le joueur. L'IA va essayer d'obtenir des combinaisons donnant acces a des coups speciaux qui perturbent le joueur. Choisie lorsque le joueur est susceptible de completer une main dangereuse
+            (non implemente) 3: Perturber le joueur. L'IA va essayer d'obtenir des combinaisons donnant acces a des coups speciaux qui perturbent le joueur. Choisie lorsque le joueur est susceptible de completer une main dangereuse
+
+            4 a 7: Memes priorites mais avec un joker en main
         */
         bool modeDiagnostic;
         bool cartesCachees;
-        std::vector<Carte> memoire; //La memoire contient les cartes qui ont ete defaussees
+        //std::vector<Carte> memoire; //La memoire contient les cartes qui ont ete defaussees (non implemente)
         std::vector<int> correctVerifie, correctVerifieDesordre, correctJoker, correctJokerDesordre, correctVerifieDiableDesordre, correctVerifieMaudite, correctVerifieMauditeDesordre;
         //Fonctions redefinies pour un choix automatique
         void piocher(PaquetCartes& pioche, PaquetCartes& defausse, int numeroCarte);
