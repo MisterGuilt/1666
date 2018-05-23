@@ -29,7 +29,7 @@ Interface graphique:
 Cette interface n'est pas encore reliée au jeu.
 Elle permet de tester la défausse (cliquer sur la 4éme carte) et l'échange des cartes cachées (cliquer sur les cartes 3 et 4)
 
-Pour compiler l'interface graphique, il faut avoir installé la SDL 1.2 (64 bits) et le plugin SDL_ttf
+Pour compiler l'interface graphique, il faut avoir installé la SDL 1.2 (64 bits) et les plugins SDL_ttf et SDL_mixer
 
 Compilateur utilisé: minGW/GNU GCC avec comme options:
 
@@ -41,5 +41,6 @@ Linker settings:
 -lSDLmain
 -lSDL
 -lSDL_ttf
+-lSDL_mixer
 
 Si problème avec to_string lors de la compilation, il existe un patch: http://tehsausage.com/mingw-to-string
