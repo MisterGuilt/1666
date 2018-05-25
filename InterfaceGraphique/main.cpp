@@ -2,9 +2,9 @@
 #include <sstream>
 #include <stdlib.h>
 //#include <stdio.h>
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL_ttf.h>
 #include <time.h>
 #include <string>
 #define HAUTEUR 600
@@ -23,7 +23,6 @@ void EventProcessing2(SDL_Rect *,SDL_Surface *,int *,int *,int *, int *,int *,in
 
 int page_principale(SDL_Surface* screen,int event2)
 {
-    //int event;        ///si on click sur un bouton on change d'image
     SDL_Rect position_B2;
     position_B2.x=0;
     position_B2.y=0;
@@ -35,12 +34,11 @@ int page_principale(SDL_Surface* screen,int event2)
     }
     else
     {
-        //SDL_FreeSurface(&bouton_Principal);
         bouton_Principal=SDL_LoadBMP ("play.bmp");
         SDL_SetColorKey(bouton_Principal, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Principal->format, 255, 174, 201));
     }
 
-    SDL_Rect positionB;                      //affichage de l'image de fond sur l'ecran de démarrage du jeu
+    SDL_Rect positionB;
     SDL_Surface *maSurface=NULL;
     maSurface = SDL_LoadBMP("royau.bmp");
     SDL_BlitSurface (maSurface, NULL ,screen, &position_B2);
@@ -53,18 +51,18 @@ int page_principale(SDL_Surface* screen,int event2)
     SDL_SetColorKey(bouton_Exit, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Principal->format, 255, 127, 39));  ///transparence bouton de jeu
 
     SDL_Rect position_Titre;
-    position_Titre.x= 150;
+    position_Titre.x= 90;
+     position_Titre.y=0;
     SDL_Surface *texte = NULL;
     TTF_Font *police = NULL;
     SDL_Color couleurBlanche = {255, 255, 255};
-    police = TTF_OpenFont("monof56.ttf", 80);           // Chargement de la police
+    police = TTF_OpenFont("monof56.ttf", 98);           // Chargement de la police
     texte = TTF_RenderText_Blended(police, "Bienvenue sur 1666 !", couleurBlanche);      // Écriture du texte dans la SDL_Surface texte en mode Blended (optimal)
     SDL_BlitSurface (bouton_Principal, NULL ,screen, &positionB);
     positionB.x = 50;
     positionB.y = 320;
     SDL_BlitSurface (bouton_Exit, NULL ,screen, &positionB);
     SDL_BlitSurface (texte, NULL ,screen, &position_Titre);
-    //EventProcessing(&position,screen);
     SDL_Flip(screen);
 
         return 1;
@@ -124,7 +122,6 @@ int random_Card_Figure(int index,int *cpt)     //ca genere une carte aléatoireme
 }
 void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_precedente,int *carte_actuel,int *carte_pioche, int *tour,int *click_defausse,int *click_switch,SDL_Surface **image_Cartes)
 {
-    //int continuerTour=1;
     SDL_Event event2;
     SDL_Rect ptr_position2;
 
@@ -142,9 +139,13 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
     affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
     SDL_BlitSurface (texte_Cpt_NbTour, NULL ,ptr_screen, &position_cpt_NbTour);
 
+    Mix_Chunk *music_carte;
+    music_carte=Mix_LoadWAV("click.wav");
+
     int evenement_non_trouve=1;
     int switch1=0;
     int defausse=0;
+    //Mix_VolumeChunk(music_carte, 0);
     while (evenement_non_trouve)
     {
         SDL_WaitEvent(&event2);
@@ -154,6 +155,7 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             ptr_position2.y = event2.button.y;
             if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[3]))
             {
+                Mix_PlayChannel(2, music_carte, 0);
                 *tour=1+*tour;                                            ///click sur la defausse
                 defausse=4;
                 switch1=0;                                               ///le joueur choisie de se separer de la 4eme carte
@@ -164,6 +166,7 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             }
             else if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[2]))
             {
+                Mix_PlayChannel(2, music_carte, 0);
                 *tour=1+*tour;
                 defausse=3;
                 switch1=0;
@@ -174,6 +177,7 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             }
             else if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[1]))
             {
+                Mix_PlayChannel(2, music_carte, 0);
                 *tour=1+*tour;
                 defausse=2;
                 switch1=0;
@@ -184,6 +188,7 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             }
             else if (ptr_position2.x>200&&ptr_position2.x<370&&ptr_position2.y>280&&ptr_position2.y<400&&(click_defausse[0]))
             {
+                Mix_PlayChannel(2, music_carte, 0);
                 *tour=1+*tour;
                 defausse=1;
                 switch1=0;
@@ -194,6 +199,7 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             }
             else if (ptr_position2.x>650&&ptr_position2.x<745&&ptr_position2.y>410&&ptr_position2.y<530&&(*click_switch))
             {
+                Mix_PlayChannel(2, music_carte, 0);
                 *tour=1+*tour;              ///click sur la 3eme carte
                 defausse=0;     ///si switch1==1 et defausse egal a 0 on permute les cartes du joueur
                 switch1=1;
@@ -204,6 +210,7 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
             }
             else if (ptr_position2.x>480&&ptr_position2.x<630&&ptr_position2.y>280&&ptr_position2.y<400&&click_defausse[4]) ///change de figure  ptr_position2.x>370&&
             {
+                Mix_PlayChannel(2, music_carte, 0);
                 *tour=1+*tour;
                 switch1=2;
                 defausse=0;
@@ -222,8 +229,8 @@ void EventProcessing2(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_
     }
     //SDL_PollEvent(&event);
     SDL_Flip(ptr_screen);
+    //Mix_FreeChunk(music_carte);
 }
-
 int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_precedente,int *carte_actuel,int *carte_pioche, int *tour)
 {
     SDL_Surface *image_Cartes[52];
@@ -232,16 +239,23 @@ int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_pr
     SDL_Event event;
     affichage_Plateau(ptr_screen);
     affichageCartes(image_Cartes,ptr_position, ptr_screen, carte_precedente, carte_actuel, tour);
-
+    int nb_click=2;
     SDL_Surface *dates=NULL;
+    SDL_Surface *Regle_Du_Jeu=NULL;
     SDL_Rect position_image_dates;
     position_image_dates.x=400;
     position_image_dates.y=0;
     dates=SDL_LoadBMP ("dates3.bmp");
+    Regle_Du_Jeu=SDL_LoadBMP ("Regle_Du_Jeu.bmp");
 
     int click_defausse[5];
     SDL_Rect ptr_position1;
     int click_switch=0;
+
+    Mix_Music *generique;
+    generique=Mix_LoadMUS("music.mp3");
+    Mix_PlayMusic(generique,-1);
+
     while (continuer)
     {
         SDL_WaitEvent(&event);
@@ -265,6 +279,9 @@ int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_pr
                             continuer=page_principale_processing(ptr_position,ptr_screen,carte_precedente,carte_actuel,carte_pioche,tour);
                         }
                         break;
+                   /* case SDLK_p :
+                        Mix_PausedMusic();
+                        break;*/
                     default :
                         break;
                 }
@@ -280,20 +297,50 @@ int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_pr
                 {
                     return 0;
                 }
-                else if (event.button.x>950&&event.button.x<1030&&event.button.y>20&&event.button.y<=50)    ///affichage des dates a avoir
+                else if (event.button.x>980&&event.button.x<1030&&event.button.y>20&&event.button.y<=50)    ///affichage des dates a avoir
                 {
                     SDL_SetColorKey(dates, SDL_SRCCOLORKEY, SDL_MapRGB(dates->format, 255, 242, 0));
                     SDL_BlitSurface (dates, NULL ,ptr_screen, &position_image_dates);
                     SDL_PollEvent(&event);
                     SDL_Flip(ptr_screen);
                     SDL_WaitEvent(&event);
-                    if (event.button.x>950&&event.button.x<1030&&event.button.y>20&&event.button.y<=50)
+                    if (event.button.x>970&&event.button.x<1030&&event.button.y>20&&event.button.y<=50)
                     {
                         affichage_Plateau(ptr_screen);
                         affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
                         SDL_Flip(ptr_screen);
                     }
                     //SDL_Delay(2000);
+                }
+                else if (event.button.x>930&&event.button.x<970&&event.button.y>20&&event.button.y<=50)    ///affichage des regles du jeu
+                {
+                    position_image_dates.y=10;
+                    SDL_SetColorKey(Regle_Du_Jeu, SDL_SRCCOLORKEY, SDL_MapRGB(Regle_Du_Jeu->format, 255, 242, 0));
+                    SDL_BlitSurface (Regle_Du_Jeu, NULL ,ptr_screen, &position_image_dates);
+                    SDL_PollEvent(&event);
+                    SDL_Flip(ptr_screen);
+                    SDL_WaitEvent(&event);
+                    if (event.button.x>900&&event.button.x<1030&&event.button.y>20&&event.button.y<=50)
+                    {
+                        affichage_Plateau(ptr_screen);
+                        affichageCartes(image_Cartes,ptr_position,  ptr_screen, carte_precedente, carte_actuel, tour);
+                        SDL_Flip(ptr_screen);
+                    }
+                    //SDL_Delay(2000);
+                }
+                else if (event.button.x>880&&event.button.x<920&&event.button.y>20&&event.button.y<=50)   ///couper les son
+                {
+                    //Mix_VolumeChunk(music_carte, 0);
+                    //Mix_VolumeMusic(0);
+                    nb_click++;
+                    if (nb_click%2==0)
+                    {
+                        Mix_ResumeMusic();
+                    }
+                    else
+                    {
+                        Mix_PauseMusic();
+                    }
                 }
                 else if (ptr_position1.x>750&&ptr_position1.x<820&&ptr_position1.y>410&&ptr_position1.y<530)    ///4eme carte du joueur
                 {
@@ -332,6 +379,7 @@ int EventProcessing(SDL_Rect *ptr_position,SDL_Surface *ptr_screen,int *carte_pr
         }
         SDL_PollEvent(&event);
     }
+    Mix_FreeMusic(generique);
     return 1;
 }
 
@@ -342,6 +390,10 @@ void affichage_Plateau(SDL_Surface *screen)
     SDL_Rect positionB2;
     positionB2.x=1030;
     positionB2.y=20;
+
+    SDL_Surface *bouton_Regle_Du_Jeu=NULL;
+    bouton_Regle_Du_Jeu=SDL_LoadBMP ("jeu.bmp");
+    SDL_SetColorKey(bouton_Regle_Du_Jeu, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Regle_Du_Jeu->format, 255, 242, 0));
 
     SDL_Surface *bouton_Assaciner=NULL;
     SDL_Surface *bouton_Echanger=NULL;
@@ -356,6 +408,8 @@ void affichage_Plateau(SDL_Surface *screen)
     SDL_SetColorKey(bouton_Echanger, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Echanger->format, 255, 242, 0));
     SDL_SetColorKey(bouton_Perturber_rang, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Perturber_rang->format, 255, 242, 0));
 
+    SDL_Surface *bouton_non_son=NULL;
+    bouton_non_son=SDL_LoadBMP ("Non_son.bmp");
     SDL_Surface *bouton_Date=NULL;
     bouton_Date=SDL_LoadBMP ("date.bmp");
     SDL_Rect position_Date;
@@ -374,9 +428,16 @@ void affichage_Plateau(SDL_Surface *screen)
     //SDL_SetColorKey(bouton_Exit, SDL_SRCCOLORKEY, SDL_MapRGB(bouton_Principal->format, 255, 127, 39));
     SDL_SetAlpha(bouton_Exit2, SDL_SRCALPHA, 220);            // transparence du bouton play
     SDL_SetAlpha(bouton_Date, SDL_SRCALPHA, 240);
+    SDL_SetAlpha(bouton_non_son, SDL_SRCALPHA, 240);
+    SDL_SetAlpha(bouton_Regle_Du_Jeu, SDL_SRCALPHA, 230);
     SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 210, 0));
     SDL_BlitSurface (bouton_Exit2, NULL ,screen, &positionB2);
     SDL_BlitSurface (bouton_Date, NULL ,screen, &position_Date);
+    position_Date.x=position_Date.x-50;
+    SDL_BlitSurface (bouton_Regle_Du_Jeu, NULL ,screen, &position_Date);
+    position_Date.x=position_Date.x-50;
+    position_Date.y=position_Date.y+2;
+    SDL_BlitSurface (bouton_non_son, NULL ,screen, &position_Date);
 
     SDL_BlitSurface (bouton_Assaciner, NULL ,screen, &positionB3);
     positionB3.x=120;
@@ -630,6 +691,8 @@ void main_du_joueur(int *carte_precedente,int *carte_actuel,int *carte_pioche, i
 
 int page_principale_processing(SDL_Rect *position,SDL_Surface *screen,int *carte_precedente,int *carte_actuel,int *carte_pioche,int *tour)
 {
+    Mix_Chunk *son_Click;
+    son_Click=Mix_LoadWAV("click2.wav");
         main_du_joueur(carte_precedente, carte_actuel, carte_pioche, tour,0,0);
         page_principale(screen,0);
         SDL_Event event;
@@ -639,26 +702,27 @@ int page_principale_processing(SDL_Rect *position,SDL_Surface *screen,int *carte
             case SDL_QUIT:
                 return 0;
                 break;
-            case SDL_KEYDOWN:                        // Si appui sur une touche
+            case SDL_KEYDOWN:
                 switch (event.key.keysym.sym)
                 {
-                    case SDLK_ESCAPE:               // Appui sur la touche Echap, on arrête le programme
+                    case SDLK_ESCAPE:
                         return 0;
                         break;
                     default :
                         break;
                 }
                 break;
-            case SDL_MOUSEBUTTONUP:             // si clic sur boutton
-                if (event.button.y > 190 && event.button.y <= 280  && event.button.x > 100 && event.button.x <= 300)
+            case SDL_MOUSEBUTTONUP:
+                if (event.button.y > 190 && event.button.y <= 280  && event.button.x > 100 && event.button.x <= 300)    ///bouton play
                     {
+                        Mix_PlayChannel(2, son_Click, 0);
                         page_principale(screen,1);
                         SDL_Delay(500);
                         EventProcessing(position,screen, carte_precedente, carte_actuel,carte_pioche, tour);
                         //SDL_SetAlpha(bouton_floute, SDL_SRCALPHA, 150);
                         return 0;
                     }
-                else if (event.button.y >350 && event.button.y <= 410  && event.button.x > 100 && event.button.x <= 300)
+                else if (event.button.y >350 && event.button.y <= 410  && event.button.x > 100 && event.button.x <= 300)    ///bouton arret
                     {
                         return 0;
                     }
@@ -666,6 +730,7 @@ int page_principale_processing(SDL_Rect *position,SDL_Surface *screen,int *carte
             default:
                 break;
         }
+        Mix_FreeChunk(son_Click);
         return 1;
 }
 
@@ -697,11 +762,15 @@ int main(int argc, char **argv)
     {
         printf("%s",Mix_GetError());
     }
-    Mix_Music *generique;
-    generique=Mix_LoadMUS("music.mp3");
+    //Mix_Music *generique;
+    //generique=Mix_LoadMUS("music.mp3");
+    //Mix_Music *music_victoire;
+    Mix_Music *music_debut;
+    music_debut=Mix_LoadMUS("victoire.mp3");
+    Mix_PlayMusic(music_debut,-1);
+
     while (cont)
     {
-        Mix_PlayMusic(generique,-1);
         cont=page_principale_processing(&position,screen, carte_precedente, carte_actuel,carte_pioche, &tour);
     }
     if (screen == NULL)      // Si l'ouverture a échoué, on le note et on arrête
@@ -709,7 +778,9 @@ int main(int argc, char **argv)
         fprintf(stderr, "Impossible de charger le mode vidéo 2  : %s\n", SDL_GetError());
         exit(EXIT_FAILURE);
     }
-    Mix_FreeMusic(generique);
+
+    SDL_FreeSurface(screen);
+    Mix_FreeMusic(music_debut);
     Mix_CloseAudio();
     //TTF_CloseFont(police);          // Doit être avant TTF_Quit()
     quit();
@@ -718,6 +789,5 @@ int main(int argc, char **argv)
 
 
 
-///jerer le tour du joueur
 ///il faut desalouer les variable dynamique creé (pointeur etc.)
 ///gestion de l'Affichage dynamique pr le déplacement des cartes
